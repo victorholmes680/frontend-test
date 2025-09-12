@@ -150,6 +150,51 @@ export class EquipmentService {
   }
 
   // Depreciation endpoints
+  static async getLatestDepreciatedMonth(equipmentId: string): Promise<string> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/depreciation/latestDepreciatedMonth/${equipmentId}`);
+    return response.data;
+  }
+
+  static async processDepreciation(targetMonth: string): Promise<string> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/depreciation/process?targetMonth=${targetMonth}`, {
+      method: 'POST'
+    });
+    return response.data;
+  }
+
+  static async cancelDepreciation(targetMonth: string): Promise<string> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/depreciation/cancel?targetMonth=${targetMonth}`, {
+      method: 'POST'
+    });
+    return response.data;
+  }
+
+  static async getDepreciationReport(targetMonth?: string, departmentId?: string, equipmentTypeId?: string): Promise<any[]> {
+    const params = new URLSearchParams();
+    if (targetMonth) params.append('targetMonth', targetMonth);
+    if (departmentId) params.append('departmentId', departmentId);
+    if (equipmentTypeId) params.append('equipmentTypeId', equipmentTypeId);
+    
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/depreciation/report?${params.toString()}`);
+    return response.data;
+  }
+
+  static async getCurrentValueReport(equipmentCode?: string, equipmentName?: string, equipmentTypeId?: string): Promise<any[]> {
+    const params = new URLSearchParams();
+    if (equipmentCode) params.append('equipmentCode', equipmentCode);
+    if (equipmentName) params.append('equipmentName', equipmentName);
+    if (equipmentTypeId) params.append('equipmentTypeId', equipmentTypeId);
+    
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/depreciation/report/currentValue?${params.toString()}`);
+    return response.data;
+  }
+
+  static async getEquipmentCurrentValue(equipmentId: string): Promise<any> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/depreciation/currentValue/${equipmentId}`);
+    return response.data;
+  }
+
+  // Legacy depreciation endpoints (keeping for backward compatibility)
   static async getDepreciationByEquipment(equipmentId: string): Promise<EquipmentDepreciation[]> {
     return apiRequest<EquipmentDepreciation[]>(`${API_BASE_URL}/equipment/${equipmentId}/depreciation`);
   }

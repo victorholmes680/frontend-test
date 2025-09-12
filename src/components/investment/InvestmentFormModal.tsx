@@ -174,8 +174,7 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
     setFormData((prev) => ({
       ...prev,
       equipmentId: equipment.equipId,
-      // Set investment remain value to the equipment's current value
-      investmentRemainValue: equipment.currentValue || 0,
+      // Don't auto-set investment remain value, let user input manually
     }));
     setSelectedEquipmentName(equipment.equipName);
 

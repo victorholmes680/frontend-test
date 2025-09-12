@@ -950,6 +950,233 @@ body {
   background-color: var(--primary-hover);
 }
 
+/* Tab Navigation Styles */
+.tab-navigation {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  color: var(--primary-color);
+  background-color: var(--background-color);
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background-color: var(--background-color);
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+/* Report Filters Styles */
+.report-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: var(--background-color);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.report-filters .form-group {
+  margin-bottom: 0;
+}
+
+.report-filters .btn {
+  align-self: end;
+  height: fit-content;
+}
+
+/* Wide table styles for current value report */
+.data-table-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.data-table {
+  min-width: 1200px; /* Ensure table has minimum width for all columns */
+}
+
+.data-table th,
+.data-table td {
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) { min-width: 120px; } /* equipmentId */
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) { min-width: 120px; } /* equipmentCode */
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) { min-width: 150px; } /* equipmentName */
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) { min-width: 120px; } /* equipmentTypeName */
+.data-table th:nth-child(5),
+.data-table td:nth-child(5) { min-width: 120px; } /* purchaseDate */
+
+/* Depreciation Report Table Specific Styles */
+.depreciation-report .data-table {
+  min-width: 1400px; /* Wider table for depreciation report */
+}
+
+.depreciation-report .data-table th:nth-child(1),
+.depreciation-report .data-table td:nth-child(1) { min-width: 120px; } /* equipmentId */
+.depreciation-report .data-table th:nth-child(2),
+.depreciation-report .data-table td:nth-child(2) { min-width: 100px; } /* equipmentCode */
+.depreciation-report .data-table th:nth-child(3),
+.depreciation-report .data-table td:nth-child(3) { min-width: 150px; } /* equipmentName */
+.depreciation-report .data-table th:nth-child(4),
+.depreciation-report .data-table td:nth-child(4) { min-width: 120px; } /* equipmentSpecification */
+.depreciation-report .data-table th:nth-child(5),
+.depreciation-report .data-table td:nth-child(5) { min-width: 100px; } /* equipmentTypeName */
+.depreciation-report .data-table th:nth-child(6),
+.depreciation-report .data-table td:nth-child(6) { min-width: 120px; } /* originalValue */
+.depreciation-report .data-table th:nth-child(7),
+.depreciation-report .data-table td:nth-child(7) { min-width: 120px; } /* residualValue */
+.depreciation-report .data-table th:nth-child(8),
+.depreciation-report .data-table td:nth-child(8) { min-width: 120px; } /* depreciationAmount */
+.depreciation-report .data-table th:nth-child(9),
+.depreciation-report .data-table td:nth-child(9) { min-width: 120px; } /* currentValue */
+.depreciation-report .data-table th:nth-child(10),
+.depreciation-report .data-table td:nth-child(10) { min-width: 120px; } /* investmentValue */
+
+/* Success and Error Message Styles */
+.success-message {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: var(--success-color);
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: var(--danger-color);
+  padding: 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+/* Depreciation Month Cell Styles */
+.depreciation-month-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.depreciation-month {
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+}
+
+/* Equipment List Table Specific Styles */
+.equipment-list {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.equipment-list .table {
+  min-width: 1200px; /* Wider table for equipment list */
+  width: 100%;
+}
+
+.equipment-list .table th:nth-child(1),
+.equipment-list .table td:nth-child(1) { min-width: 100px; } /* equipmentNo */
+.equipment-list .table th:nth-child(2),
+.equipment-list .table td:nth-child(2) { min-width: 150px; } /* equipmentName */
+.equipment-list .table th:nth-child(3),
+.equipment-list .table td:nth-child(3) { min-width: 120px; } /* equipmentModel */
+.equipment-list .table th:nth-child(4),
+.equipment-list .table td:nth-child(4) { min-width: 100px; } /* equipmentTypeName */
+.equipment-list .table th:nth-child(5),
+.equipment-list .table td:nth-child(5) { min-width: 100px; } /* manufacturer */
+.equipment-list .table th:nth-child(6),
+.equipment-list .table td:nth-child(6) { min-width: 120px; } /* purchaseDate */
+.equipment-list .table th:nth-child(7),
+.equipment-list .table td:nth-child(7) { min-width: 120px; } /* originValueOfAssets */
+.equipment-list .table th:nth-child(8),
+.equipment-list .table td:nth-child(8) { min-width: 120px; } /* expectedResidualValue */
+.equipment-list .table th:nth-child(9),
+.equipment-list .table td:nth-child(9) { min-width: 120px; } /* investmentMoney */
+.equipment-list .table th:nth-child(10),
+.equipment-list .table td:nth-child(10) { min-width: 100px; } /* depreciation months */
+.equipment-list .table th:nth-child(11),
+.equipment-list .table td:nth-child(11) { min-width: 100px; } /* status */
+.equipment-list .table th:nth-child(12),
+.equipment-list .table td:nth-child(12) { min-width: 120px; } /* last depreciation month */
+.equipment-list .table th:nth-child(13),
+.equipment-list .table td:nth-child(13) { min-width: 100px; } /* actions */
+
+/* Ensure table cells don't wrap and maintain proper spacing */
+.equipment-list .table th,
+.equipment-list .table td {
+  white-space: nowrap;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Add scrollbar styling for better UX */
+.equipment-list::-webkit-scrollbar {
+  height: 8px;
+}
+
+.equipment-list::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 4px;
+}
+
+.equipment-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.equipment-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Table scroll hint styling */
+.table-scroll-hint {
+  background-color: var(--info-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem 0.375rem 0 0;
+  text-align: center;
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+.scroll-hint-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* Responsive Design for Investment/Depreciation Pages */
 @media (max-width: 768px) {
   .page-header {
@@ -982,5 +1209,18 @@ body {
   
   .equipment-select-container {
     flex-direction: column;
+  }
+  
+  .tab-navigation {
+    flex-wrap: wrap;
+  }
+  
+  .tab-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .report-filters {
+    grid-template-columns: 1fr;
   }
 }
