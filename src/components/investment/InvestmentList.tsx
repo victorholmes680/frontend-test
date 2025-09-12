@@ -132,10 +132,13 @@ const InvestmentList = forwardRef<InvestmentListRef, InvestmentListProps>(
                       <tr key={investment.id}>
                         <td>{investment.equipmentName}</td>
                         <td className="amount">
-                          ¥{investment.investmentValue?.toLocaleString()}
+                          ¥{(investment.investmentValue || 0).toLocaleString()}
                         </td>
                         <td className="amount">
-                          ¥{investment.investmentRemainValue?.toLocaleString()}
+                          ¥
+                          {(
+                            investment.investmentRemainValue || 0
+                          ).toLocaleString()}
                         </td>
                         <td>{investment.investmentMonth}</td>
                         <td className="description">

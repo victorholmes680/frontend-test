@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Equipment } from '../../types/equipment';
-import { EquipmentService } from '../../services/api';
+import React, { useState, useEffect } from "react";
+import { Equipment } from "../../types/equipment";
+import { EquipmentService } from "../../services/api";
 
 interface EquipmentSelectionPopupProps {
   isOpen: boolean;
@@ -9,17 +9,19 @@ interface EquipmentSelectionPopupProps {
   title?: string;
 }
 
-const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSelect, 
-  title = "选择设备" 
+const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
+  isOpen,
+  onClose,
+  onSelect,
+  title = "选择设备",
 }) => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [filteredEquipment, setFilteredEquipment] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(
+    null
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -29,10 +31,11 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
 
   useEffect(() => {
     if (equipment.length > 0) {
-      const filtered = equipment.filter(item => 
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.equipNo.toLowerCase().includes(searchTerm.toLowerCase())
+      const filtered = equipment.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.equipNo.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredEquipment(filtered);
     }
@@ -45,7 +48,7 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
       setEquipment(data);
       setFilteredEquipment(data);
     } catch (err) {
-      console.error('Failed to fetch equipment:', err);
+      console.error("Failed to fetch equipment:", err);
     } finally {
       setLoading(false);
     }
@@ -56,25 +59,33 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
       onSelect(selectedEquipment);
       onClose();
       setSelectedEquipment(null);
-      setSearchTerm('');
+      setSearchTerm("");
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'active': return '正常';
-      case 'inactive': return '停用';
-      case 'maintenance': return '维护中';
-      default: return '未知';
+      case "active":
+        return "正常";
+      case "inactive":
+        return "停用";
+      case "maintenance":
+        return "维护中";
+      default:
+        return "未知";
     }
   };
 
   const getStatusClass = (status: string) => {
     switch (status) {
-      case 'active': return 'status-active';
-      case 'inactive': return 'status-inactive';
-      case 'maintenance': return 'status-maintenance';
-      default: return 'status-inactive';
+      case "active":
+        return "status-active";
+      case "inactive":
+        return "status-inactive";
+      case "maintenance":
+        return "status-maintenance";
+      default:
+        return "status-inactive";
     }
   };
 
@@ -85,9 +96,11 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
       <div className="popup-content equipment-selection-popup">
         <div className="popup-header">
           <h3>{title}</h3>
-          <button className="popup-close" onClick={onClose}>&times;</button>
+          <button className="popup-close" onClick={onClose}>
+            &times;
+          </button>
         </div>
-        
+
         <div className="popup-body">
           <div className="search-section">
             <input
@@ -98,7 +111,7 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="equipment-list">
             {loading ? (
               <div className="loading">正在加载设备...</div>
@@ -107,21 +120,42 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
                 {filteredEquipment.map((item) => (
                   <div
                     key={item.id}
-                    className={`equipment-card-popup ${selectedEquipment?.id === item.id ? 'selected' : ''}`}
+                    className={`equipment-card-popup ${
+                      selectedEquipment?.id === item.id ? "selected" : ""
+                    }`}
                     onClick={() => setSelectedEquipment(item)}
                   >
                     <div className="equipment-card-header">
                       <h4>{item.name}</h4>
-                      <span className={`status-badge ${getStatusClass(item.status)}`}>
+                      <span
+                        className={`status-badge ${getStatusClass(
+                          item.status
+                        )}`}
+                      >
                         {getStatusText(item.status)}
                       </span>
                     </div>
                     <div className="equipment-card-body">
-                      <p><strong>编号:</strong> {item.equipNo}</p>
-                      <p><strong>类型:</strong> {item.type}</p>
-                      <p><strong>原始价值:</strong> ${item.originalValue.toLocaleString()}</p>
-                      <p><strong>当前价值:</strong> ${item.currentValue.toLocaleString()}</p>
-                      <p><strong>购买日期:</strong> {new Date(item.purchaseDate).toLocaleDateString()}</p>
+                      <p>
+                        <strong>编号:</strong> {item.equipNo}
+                      </p>
+                      <p>
+                        <strong>类型:</strong> {item.type}
+                      </p>
+                      <p>
+                        <strong>原始价值:</strong> $
+                        {(item.originalValue || 0).toLocaleString()}
+                      </p>
+                      <p>
+                        <strong>当前价值:</strong> $
+                        {(item.currentValue || 0).toLocaleString()}
+                      </p>
+                      <p>
+                        <strong>购买日期:</strong>{" "}
+                        {item.purchaseDate
+                          ? new Date(item.purchaseDate).toLocaleDateString()
+                          : "N/A"}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -129,11 +163,13 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
             )}
           </div>
         </div>
-        
+
         <div className="popup-footer">
-          <button className="btn btn-secondary" onClick={onClose}>取消</button>
-          <button 
-            className="btn btn-primary" 
+          <button className="btn btn-secondary" onClick={onClose}>
+            取消
+          </button>
+          <button
+            className="btn btn-primary"
             onClick={handleSelect}
             disabled={!selectedEquipment}
           >

@@ -1,6 +1,6 @@
 class AuthTokenService {
   private static instance: AuthTokenService;
-  private token: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVxdWlwMDAxIiwiZXhwIjoxNzU3NjQ1MTkxfQ.gDp9tt9K0Omev2SpNRFFQIpX-mPfhAufFDmnXJjTPSo';
+  private token: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVxdWlwMDAxIiwiZXhwIjoxNzU3NjU3MDE5fQ.mESGNwfrCnfEeuCZhviDTIZq40qrAX3tJiEtSp6tBNQ';
 
   private constructor() {}
 

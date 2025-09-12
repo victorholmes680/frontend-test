@@ -43,21 +43,14 @@ const InvestmentPage: React.FC = () => {
   ) => {
     try {
       if (editingInvestment) {
-        // Update existing investment
-        setInvestments((prev) =>
-          prev.map((inv) =>
-            inv.id === editingInvestment.id
-              ? { ...investmentData, id: editingInvestment.id }
-              : inv
-          )
+        // Update existing investment using API
+        await EquipmentService.updateInvestment(
+          editingInvestment.id,
+          investmentData
         );
       } else {
-        // Create new investment
-        const newInvestment: EquipmentInvestment = {
-          ...investmentData,
-          id: Date.now().toString(), // Simple ID generation
-        };
-        setInvestments((prev) => [...prev, newInvestment]);
+        // Create new investment using API
+        await EquipmentService.createInvestment(investmentData);
       }
       setIsModalOpen(false);
       setEditingInvestment(null);

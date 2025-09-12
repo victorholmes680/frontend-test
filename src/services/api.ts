@@ -82,9 +82,34 @@ export class EquipmentService {
   }
 
   static async createInvestment(investment: Omit<EquipmentInvestment, 'id'>): Promise<EquipmentInvestment> {
-    return apiRequest<EquipmentInvestment>(`${API_BASE_URL}/equipment-investment`, {
+    // Map the frontend data structure to the API expected format
+    const requestBody = {
+      equipmentId: investment.equipmentId,
+      investmentValue: investment.investmentValue,
+      investmentRemainValue: investment.investmentRemainValue,
+      investmentMonth: investment.investmentMonth,
+      investmentDescription: investment.investmentDescription
+    };
+    
+    return apiRequest<EquipmentInvestment>(`${API_BASE_URL}/machine/equipment/additional-investment/add`, {
       method: 'POST',
-      body: JSON.stringify(investment)
+      body: JSON.stringify(requestBody)
+    });
+  }
+
+  static async updateInvestment(id: string, investment: Partial<EquipmentInvestment>): Promise<EquipmentInvestment> {
+    // Map the frontend data structure to the API expected format for editing
+    const requestBody = {
+      id: id,
+      investmentMonth: investment.investmentMonth,
+      investmentValue: investment.investmentValue,
+      investmentRemainValue: investment.investmentRemainValue,
+      investmentDescription: investment.investmentDescription
+    };
+    
+    return apiRequest<EquipmentInvestment>(`${API_BASE_URL}/machine/equipment/additional-investment/edit`, {
+      method: 'PUT',
+      body: JSON.stringify(requestBody)
     });
   }
 

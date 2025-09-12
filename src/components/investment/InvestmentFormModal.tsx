@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { EquipmentInvestment } from "../../types/equipment";
+import { EquipmentInvestment, Equipment } from "../../types/equipment";
+import EquipmentSelectionPopup from "../../components/common/EquipmentSelectionPopup";
+import { EquipmentService } from "../../services/api";
 
 interface InvestmentFormModalProps {
   isOpen: boolean;
@@ -14,6 +16,11 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
   onSave,
   editData,
 }) => {
+  const [selectedEquipmentName, setSelectedEquipmentName] =
+    useState<string>("");
+  const [isEquipmentPopupOpen, setIsEquipmentPopupOpen] = useState(false);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [isLoadingEquipment, setIsLoadingEquipment] = useState(false);
   const [formData, setFormData] = useState<Omit<EquipmentInvestment, "id">>({
     equipmentId: "",
     investmentValue: 0,
@@ -29,6 +36,26 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch equipment list when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchEquipment();
+    }
+  }, [isOpen]);
+
+  const fetchEquipment = async () => {
+    try {
+      setIsLoadingEquipment(true);
+      const data = await EquipmentService.getEquipmentList();
+      setEquipment(data);
+    } catch (err) {
+      console.error("Failed to fetch equipment:", err);
+    } finally {
+      setIsLoadingEquipment(false);
+    }
+  };
+
+  // Set form data when editing or creating new investment
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -42,6 +69,19 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
         // description: editData.description,
         type: editData.type,
       });
+
+      // Check for EquipmentInvestmentVo with equipmentName property
+      if ("equipmentName" in editData && editData.equipmentName) {
+        setSelectedEquipmentName(editData.equipmentName as string);
+      } else if (editData.equipmentId && equipment.length > 0) {
+        // Look up equipment name from our loaded equipment data
+        const matchedEquipment = equipment.find(
+          (e) => e.equipId === editData.equipmentId
+        );
+        if (matchedEquipment) {
+          setSelectedEquipmentName(matchedEquipment.equipName);
+        }
+      }
     } else {
       setFormData({
         equipmentId: "",
@@ -56,7 +96,7 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
       });
     }
     setErrors({});
-  }, [editData, isOpen]);
+  }, [editData, isOpen, equipment]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -66,6 +106,12 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
     }
     if (formData.investmentValue <= 0) {
       newErrors.investmentValue = "投资金额必须大于0";
+    }
+    if (formData.investmentRemainValue < 0) {
+      newErrors.investmentRemainValue = "投资剩余价值不能为负数";
+    }
+    if (formData.investmentRemainValue > formData.investmentValue) {
+      newErrors.investmentRemainValue = "投资剩余价值不能大于投资金额";
     }
     if (!formData.investmentDescription.trim()) {
       newErrors.investmentDescription = "请填写描述";
@@ -95,18 +141,52 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
     >
   ) => {
     const { name, value } = e.target;
-    setFormData(
-      (prev) =>
-        ({
-          ...prev,
-          [name]: name === "amount" ? parseFloat(value) || 0 : value,
-        } as Omit<EquipmentInvestment, "id">)
-    );
+
+    // Special handling for investment amount
+    if (name === "amount") {
+      const numValue = parseFloat(value) || 0;
+      setFormData(
+        (prev) =>
+          ({
+            ...prev,
+            investmentValue: numValue,
+            // Don't auto-update remain value - they are independent
+          } as Omit<EquipmentInvestment, "id">)
+      );
+    } else {
+      setFormData(
+        (prev) =>
+          ({
+            ...prev,
+            [name]:
+              name === "investmentRemainValue" ? parseFloat(value) || 0 : value,
+          } as Omit<EquipmentInvestment, "id">)
+      );
+    }
 
     // Clear error when field is modified
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
+  };
+
+  const handleSelectEquipment = (equipment: Equipment) => {
+    setFormData((prev) => ({
+      ...prev,
+      equipmentId: equipment.equipId,
+      // Set investment remain value to the equipment's current value
+      investmentRemainValue: equipment.currentValue || 0,
+    }));
+    setSelectedEquipmentName(equipment.equipName);
+
+    // Clear error if it exists
+    if (errors.equipmentId) {
+      setErrors((prev) => ({ ...prev, equipmentId: "" }));
+    }
+  };
+
+  const openEquipmentPopup = () => {
+    setIsEquipmentPopupOpen(true);
   };
 
   if (!isOpen) return null;
@@ -123,22 +203,31 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
 
         <form onSubmit={handleSubmit} className="investment-form">
           <div className="form-group">
-            <label htmlFor="equipmentId">设备ID *</label>
-            <input
-              type="text"
-              id="equipmentId"
-              name="equipmentId"
-              value={formData.equipmentId}
-              onChange={handleChange}
-              className={errors.equipmentId ? "error" : ""}
-              placeholder="请输入设备ID"
-            />
+            <label htmlFor="equipmentId">设备 *</label>
+            <div className="equipment-select-container">
+              <input
+                type="text"
+                id="equipmentDisplay"
+                value={selectedEquipmentName}
+                readOnly
+                className={errors.equipmentId ? "error" : ""}
+                placeholder="请选择设备"
+                onClick={openEquipmentPopup}
+              />
+              <button
+                type="button"
+                className="select-equipment-btn"
+                onClick={openEquipmentPopup}
+              >
+                选择
+              </button>
+            </div>
             {errors.equipmentId && (
               <span className="error-message">{errors.equipmentId}</span>
             )}
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label htmlFor="type">投资类型 *</label>
             <select
               id="type"
@@ -151,7 +240,7 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
               <option value="upgrade">升级</option>
               <option value="maintenance">维护</option>
             </select>
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label htmlFor="amount">投资金额 (¥) *</label>
@@ -172,6 +261,26 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
           </div>
 
           <div className="form-group">
+            <label htmlFor="investmentRemainValue">投资剩余价值 (¥) *</label>
+            <input
+              type="number"
+              id="investmentRemainValue"
+              name="investmentRemainValue"
+              value={formData.investmentRemainValue}
+              onChange={handleChange}
+              className={errors.investmentRemainValue ? "error" : ""}
+              placeholder="请输入投资剩余价值"
+              min="0"
+              step="0.01"
+            />
+            {errors.investmentRemainValue && (
+              <span className="error-message">
+                {errors.investmentRemainValue}
+              </span>
+            )}
+          </div>
+
+          <div className="form-group">
             <label htmlFor="investmentMonth">投资月份 *</label>
             <input
               type="month"
@@ -184,10 +293,10 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">描述 *</label>
+            <label htmlFor="investmentDescription">描述 *</label>
             <textarea
-              id="description"
-              name="description"
+              id="investmentDescription"
+              name="investmentDescription"
               value={formData.investmentDescription}
               onChange={handleChange}
               className={errors.investmentDescription ? "error" : ""}
@@ -220,6 +329,14 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Equipment Selection Popup */}
+      <EquipmentSelectionPopup
+        isOpen={isEquipmentPopupOpen}
+        onClose={() => setIsEquipmentPopupOpen(false)}
+        onSelect={handleSelectEquipment}
+        title="选择设备"
+      />
     </div>
   );
 };
