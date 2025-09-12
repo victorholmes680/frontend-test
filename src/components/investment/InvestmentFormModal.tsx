@@ -1,0 +1,227 @@
+import React, { useState, useEffect } from "react";
+import { EquipmentInvestment } from "../../types/equipment";
+
+interface InvestmentFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (investment: Omit<EquipmentInvestment, "id">) => Promise<void>;
+  editData?: EquipmentInvestment | null;
+}
+
+const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  editData,
+}) => {
+  const [formData, setFormData] = useState<Omit<EquipmentInvestment, "id">>({
+    equipmentId: "",
+    investmentValue: 0,
+    investmentRemainValue: 0,
+    investmentMonth: "",
+    investmentDescription: "",
+    // amount: 0,
+    // investmentDate: new Date().toISOString().split("T")[0],
+    // description: "",
+    type: "purchase",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (editData) {
+      setFormData({
+        equipmentId: editData.equipmentId,
+        investmentValue: editData.investmentValue,
+        investmentRemainValue: editData.investmentRemainValue,
+        investmentMonth: editData.investmentMonth,
+        investmentDescription: editData.investmentDescription,
+        // amount: editData.amount,
+        // investmentDate: editData.investmentDate,
+        // description: editData.description,
+        type: editData.type,
+      });
+    } else {
+      setFormData({
+        equipmentId: "",
+        investmentValue: 0,
+        investmentRemainValue: 0,
+        investmentMonth: "",
+        investmentDescription: "",
+        // amount: 0,
+        // investmentDate: new Date().toISOString().split("T")[0],
+        // description: "",
+        type: "purchase",
+      });
+    }
+    setErrors({});
+  }, [editData, isOpen]);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.equipmentId.trim()) {
+      newErrors.equipmentId = "请选择设备";
+    }
+    if (formData.investmentValue <= 0) {
+      newErrors.investmentValue = "投资金额必须大于0";
+    }
+    if (!formData.investmentDescription.trim()) {
+      newErrors.investmentDescription = "请填写描述";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setIsSubmitting(true);
+      try {
+        await onSave(formData);
+      } catch (error) {
+        console.error("Form submission error:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData(
+      (prev) =>
+        ({
+          ...prev,
+          [name]: name === "amount" ? parseFloat(value) || 0 : value,
+        } as Omit<EquipmentInvestment, "id">)
+    );
+
+    // Clear error when field is modified
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h2>{editData ? "编辑投资记录" : "新建投资记录"}</h2>
+          <button onClick={onClose} className="modal-close">
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="investment-form">
+          <div className="form-group">
+            <label htmlFor="equipmentId">设备ID *</label>
+            <input
+              type="text"
+              id="equipmentId"
+              name="equipmentId"
+              value={formData.equipmentId}
+              onChange={handleChange}
+              className={errors.equipmentId ? "error" : ""}
+              placeholder="请输入设备ID"
+            />
+            {errors.equipmentId && (
+              <span className="error-message">{errors.equipmentId}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="type">投资类型 *</label>
+            <select
+              id="type"
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className={errors.type ? "error" : ""}
+            >
+              <option value="purchase">购买</option>
+              <option value="upgrade">升级</option>
+              <option value="maintenance">维护</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="amount">投资金额 (¥) *</label>
+            <input
+              type="number"
+              id="amount"
+              name="amount"
+              value={formData.investmentValue}
+              onChange={handleChange}
+              className={errors.investmentValue ? "error" : ""}
+              placeholder="请输入投资金额"
+              min="0"
+              step="0.01"
+            />
+            {errors.investmentValue && (
+              <span className="error-message">{errors.investmentValue}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="investmentMonth">投资月份 *</label>
+            <input
+              type="month"
+              id="investmentMonth"
+              name="investmentMonth"
+              value={formData.investmentMonth}
+              onChange={handleChange}
+              className={errors.investmentMonth ? "error" : ""}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="description">描述 *</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.investmentDescription}
+              onChange={handleChange}
+              className={errors.investmentDescription ? "error" : ""}
+              placeholder="请输入投资描述"
+              rows={3}
+            />
+            {errors.investmentDescription && (
+              <span className="error-message">
+                {errors.investmentDescription}
+              </span>
+            )}
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              disabled={isSubmitting}
+            >
+              取消
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "保存中..." : editData ? "更新" : "创建"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default InvestmentFormModal;
