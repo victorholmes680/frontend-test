@@ -44,9 +44,9 @@ const EquipmentSelectionPopup: React.FC<EquipmentSelectionPopupProps> = ({
   const fetchEquipment = async () => {
     try {
       setLoading(true);
-      const data = await EquipmentService.getEquipmentList();
-      setEquipment(data);
-      setFilteredEquipment(data);
+      const response = await EquipmentService.getEquipmentList();
+      setEquipment(response.data);
+      setFilteredEquipment(response.data);
     } catch (err) {
       console.error("Failed to fetch equipment:", err);
     } finally {

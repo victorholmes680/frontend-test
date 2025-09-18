@@ -1,4 +1,15 @@
-import { Equipment, EquipmentInvestment,EquipmentInvestmentVo, EquipmentDepreciation } from '../types/equipment';
+import {
+  Equipment,
+  EquipmentInvestment,
+  EquipmentInvestmentVo,
+  EquipmentDepreciation,
+  ManageDimensionVo,
+  ManageDimensionAddDto,
+  ManageDimensionEditDto,
+  DimensionGroups,
+  PageResponse,
+  TreeDataItem
+} from '../types/equipment';
 import { authService } from './auth';
 
 const API_BASE_URL = '/api';
@@ -32,15 +43,15 @@ async function apiRequest<T>(url: string, options: RequestInit = {}): Promise<T>
 
 export class EquipmentService {
   // Equipment endpoints
-  static async getEquipmentList(): Promise<Equipment[]> {
-    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/tree/list?pageNo=1&pageSize=15`, {
+  static async getEquipmentList(pageNo: number = 1, pageSize: number = 15): Promise<{data: Equipment[], pagination: {total: number, size: number, current: number, pages: number}}> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/tree/list?pageNo=${pageNo}&pageSize=${pageSize}`, {
       method: 'POST',
       body: JSON.stringify({})
     });
     
     // Extract equipment data from the nested response structure
-    if (response && response.data && response.data.records) {
-      return response.data.records.map((record: any) => {
+    if (response && response.data) {
+      const equipmentData = response.data.records.map((record: any) => {
         const apiData = record.data;
         return {
           ...apiData,
@@ -53,9 +64,22 @@ export class EquipmentService {
           status: apiData.equipStatus === '1' ? 'active' : 'inactive'
         };
       });
+      
+      return {
+        data: equipmentData,
+        pagination: {
+          total: response.data.total,
+          size: response.data.size,
+          current: response.data.current,
+          pages: response.data.pages
+        }
+      };
     }
     
-    return [];
+    return {
+      data: [],
+      pagination: { total: 0, size: pageSize, current: pageNo, pages: 0 }
+    };
   }
 
   static async getEquipmentById(id: string): Promise<Equipment> {
@@ -113,15 +137,15 @@ export class EquipmentService {
     });
   }
 
-  static async getInvestmentList(): Promise<EquipmentInvestmentVo[]> {
-    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/additional-investment/list?pageNo=1&pageSize=15`, {
+  static async getInvestmentList(pageNo: number = 1, pageSize: number = 15): Promise<{data: EquipmentInvestmentVo[], pagination: {total: number, size: number, current: number, pages: number}}> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/machine/equipment/additional-investment/list?pageNo=${pageNo}&pageSize=${pageSize}`, {
       method: 'POST',
       body: JSON.stringify({})
     });
     
     // Extract investment data from the nested response structure
-    if (response && response.data && response.data.records) {
-      return response.data.records.map((record: any) => {
+    if (response && response.data) {
+      const investmentData = response.data.records.map((record: any) => {
         const apiData = record;
         return {
           ...apiData,
@@ -138,9 +162,22 @@ export class EquipmentService {
           type: apiData.type
         };
       });
+      
+      return {
+        data: investmentData,
+        pagination: {
+          total: response.data.total,
+          size: response.data.size,
+          current: response.data.current,
+          pages: response.data.pages
+        }
+      };
     }
     
-    return [];
+    return {
+      data: [],
+      pagination: { total: 0, size: pageSize, current: pageNo, pages: 0 }
+    };
   }
 
   static async deleteInvestment(id: string): Promise<void> {
@@ -208,5 +245,49 @@ export class EquipmentService {
 
   static async calculateDepreciation(equipmentId: string, method: string): Promise<EquipmentDepreciation[]> {
     return apiRequest<EquipmentDepreciation[]>(`${API_BASE_URL}/equipment-depreciation/calculate/${equipmentId}?method=${method}`);
+  }
+
+  // ManageDimension CRUD endpoints
+  static async addDimension(dimension: ManageDimensionAddDto): Promise<string> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/energy/iot/manage/dimension/add`, {
+      method: 'POST',
+      body: JSON.stringify(dimension)
+    });
+    return response.data;
+  }
+
+  static async removeDimension(mdId: string): Promise<string> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/energy/iot/manage/dimension/remove/${mdId}`, {
+      method: 'DELETE'
+    });
+    return response.data;
+  }
+
+  static async editDimension(dimension: ManageDimensionEditDto): Promise<string> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/energy/iot/manage/dimension/edit`, {
+      method: 'PUT',
+      body: JSON.stringify(dimension)
+    });
+    return response.data;
+  }
+
+  static async getDimensionTreeList(): Promise<any[]> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/energy/iot/manage/dimension/treeList`);
+    return response.data;
+  }
+
+  static async getDimensionTreeListByGroup(): Promise<any[]> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/energy/iot/manage/dimension/treeListByGroup`);
+    return response.data;
+  }
+
+  static async getDimensionDetail(mdId: string): Promise<ManageDimensionVo> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/energy/iot/manage/dimension/edit/detail/${mdId}`);
+    return response.data;
+  }
+
+  static async getDimensionGroups(): Promise<DimensionGroups> {
+    const response = await apiRequest<any>(`${API_BASE_URL}/energy/iot/manage/dimension/dimensionGroups`);
+    return response.data;
   }
 }

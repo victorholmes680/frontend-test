@@ -64,3 +64,51 @@ export interface EquipmentDepreciation {
   depreciationDate: string;
   method: 'straight-line' | 'declining-balance' | 'units-of-production';
 }
+
+// ManageDimension types
+export interface ManageDimensionVo {
+  mdId: string;
+  mdName: string;
+  dimensionGroupId: string;
+  dimensionGroupName: string;
+  area?: number;
+  parentId: string;
+  orderNo?: number;
+}
+
+export interface ManageDimensionAddDto {
+  dimensionGroupId: string;
+  mdName: string;
+  area?: number;
+  parentId?: string;
+  orderNo?: number;
+}
+
+export interface ManageDimensionEditDto extends ManageDimensionAddDto {
+  mdId: string;
+}
+
+export interface DimensionGroups {
+  [key: string]: string;
+}
+
+export interface PageResponse<T> {
+  records: T[];
+  total: number;
+  size: number;
+  current: number;
+  pages: number;
+}
+
+export interface TreeDataItem {
+  key: string;
+  label: string;
+  children?: TreeDataItem[];
+  mdId: string;
+  mdName: string;
+  dimensionGroupId: string;
+  dimensionGroupName: string;
+  area?: number;
+  parentId: string;
+  orderNo?: number;
+}

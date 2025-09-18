@@ -27,6 +27,12 @@ const Navigation: React.FC = () => {
           >
             设备折旧
           </Link>
+          <Link
+            to="/dimension"
+            className={`nav-link ${isActive("/dimension")}`}
+          >
+            管理维度
+          </Link>
         </div>
       </div>
     </nav>

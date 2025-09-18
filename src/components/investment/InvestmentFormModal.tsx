@@ -46,8 +46,8 @@ const InvestmentFormModal: React.FC<InvestmentFormModalProps> = ({
   const fetchEquipment = async () => {
     try {
       setIsLoadingEquipment(true);
-      const data = await EquipmentService.getEquipmentList();
-      setEquipment(data);
+      const response = await EquipmentService.getEquipmentList();
+      setEquipment(response.data);
     } catch (err) {
       console.error("Failed to fetch equipment:", err);
     } finally {

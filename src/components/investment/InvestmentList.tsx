@@ -26,16 +26,25 @@ const InvestmentList = forwardRef<InvestmentListRef, InvestmentListProps>(
     const [investments, setInvestments] = useState<EquipmentInvestmentVo[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize] = useState(15);
+    const [pagination, setPagination] = useState({
+      total: 0,
+      size: 15,
+      current: 1,
+      pages: 0
+    });
 
     useEffect(() => {
       fetchInvestments();
-    }, []);
+    }, [currentPage]);
 
     const fetchInvestments = async () => {
       try {
         setLoading(true);
-        const data = await EquipmentService.getInvestmentList();
-        setInvestments(data);
+        const result = await EquipmentService.getInvestmentList(currentPage, pageSize);
+        setInvestments(result.data);
+        setPagination(result.pagination);
       } catch (err) {
         setError(err instanceof Error ? err.message : "获取投资列表失败");
       } finally {
@@ -166,6 +175,34 @@ const InvestmentList = forwardRef<InvestmentListRef, InvestmentListProps>(
                     ))}
                 </tbody>
               </table>
+            
+            {/* Pagination Controls */}
+            {pagination.pages > 1 && (
+              <div className="pagination-container">
+                <div className="pagination-info">
+                  显示 {(pagination.current - 1) * pagination.size + 1} - {Math.min(pagination.current * pagination.size, pagination.total)} 条，共 {pagination.total} 条记录
+                </div>
+                <div className="pagination-controls">
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={pagination.current === 1}
+                  >
+                    上一页
+                  </button>
+                  <span className="pagination-current">
+                    第 {pagination.current} / {pagination.pages} 页
+                  </span>
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={() => setCurrentPage(prev => Math.min(pagination.pages, prev + 1))}
+                    disabled={pagination.current === pagination.pages}
+                  >
+                    下一页
+                  </button>
+                </div>
+              </div>
+            )}
             </div>
           )}
         </div>
